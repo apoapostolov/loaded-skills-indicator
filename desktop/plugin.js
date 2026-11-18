@@ -365,7 +365,7 @@ const SR_ONLY = {
   border: 0
 }
 
-/** `● 6 ○ 2` — the numbers stay, the labels become glyphs. Each group carries
+/** `● 6 ⊘ 2` — the numbers stay, the labels become glyphs. Each group carries
  *  its words in a tooltip, and the pair carries them once for assistive tech. */
 function ChipCounts({ count, pruned }) {
   const group = (kind, n, label) =>
@@ -414,6 +414,18 @@ function ChipIcon() {
 
 /* ---------- popover ---------- */
 
+/** Popover section header: the chip's glyph, then the label and count it
+ *  explains, so `● In context · 6` reads without a hover. */
+function GroupHeader({ kind, label, count, pad }) {
+  return jsxs('div', {
+    style: { display: 'flex', alignItems: 'center', gap: 5, padding: pad, fontSize: 10, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--ui-text-quaternary)' },
+    children: [
+      jsx(Glyph, { key: 'g', kind }),
+      jsx('span', { key: 't', style: { fontVariantNumeric: 'tabular-nums' }, children: label + ' · ' + count })
+    ]
+  })
+}
+
 function SkillsPanel({ onClose }) {
   const { data, isError, isLoading } = useSkills()
   const skills = data && Array.isArray(data.skills) ? data.skills : []
@@ -435,13 +447,13 @@ function SkillsPanel({ onClose }) {
   } else {
     if (full.length) {
       body.push(
-        jsx('div', { key: 'fh', style: { padding: '6px 12px 2px', fontSize: 10, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--ui-text-quaternary)' }, children: 'In context · ' + full.length })
+        jsx(GroupHeader, { key: 'fh', kind: 'full', label: 'In context', count: full.length, pad: '6px 12px 2px' })
       )
       full.forEach(s => body.push(jsx(SkillRow, { skill: s }, 'f-' + s.name)))
     }
     if (pruned.length) {
       body.push(
-        jsx('div', { key: 'ph', style: { padding: '8px 12px 2px', fontSize: 10, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--ui-text-quaternary)' }, children: 'Pruned · ' + pruned.length })
+        jsx(GroupHeader, { key: 'ph', kind: 'pruned', label: 'Pruned', count: pruned.length, pad: '8px 12px 2px' })
       )
       pruned.forEach(s => body.push(jsx(SkillRow, { skill: s }, 'p-' + s.name)))
     }
